@@ -13,7 +13,7 @@ class TranslationModel:
 
     def convert_to_sparse_vector(self, raw_data, lang="e"):
         if lang == "e":
-            return numpy.array(map(self.e_alphabet.get_index, raw_data))
+            return numpy.array(map(self.e_alphabet.get_index, raw_data), dtype=int)
 
         return numpy.array(map(self.f_alphabet.get_index, raw_data), dtype=int)
 
@@ -30,7 +30,8 @@ class TranslationModel:
             f_instance.data = self.convert_to_sparse_vector(f_instance.raw_data, "f")
 
     def init_translation_table(self):
-        self.t_table = numpy.ones([self.e_alphabet.size(), self.f_alphabet.size()])
+        self.t_table = numpy.zeros([self.e_alphabet.size(), self.f_alphabet.size()])
+        self.t_table.fill(.25)
 
     def expectation_maximization(self, iterations=10):
         for i in range(iterations):
@@ -62,8 +63,8 @@ class TranslationModel:
         self.init_translation_table()
         self.expectation_maximization()
 
-        for i in range(10):
-            for j in range(10):
+        for i in range(self.e_alphabet.size()):
+            for j in range(self.f_alphabet.size()):
                 print self.e_alphabet.get_label(i),
                 print self.f_alphabet.get_label(j),
                 print self.t_table[i,j]
