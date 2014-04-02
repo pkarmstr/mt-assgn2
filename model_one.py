@@ -88,7 +88,7 @@ class TranslationModel:
             for f in f_sentence:
                 sent_sum += self.t_table[e,f]
             product *= sent_sum
-        return product/(len(f_sentence+1)**len(e_sentence))
+        return product/(len(f_sentence)**len(e_sentence))
 
     def build_language_model(self):
         all_text = [word for e_instance,f_instance in self.aligned_sentences \
