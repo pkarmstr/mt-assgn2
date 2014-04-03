@@ -1,3 +1,6 @@
+"""
+a couple of functions which facilitate reading in data for the translation model
+"""
 __author__ = 'keelan'
 
 import codecs
@@ -8,14 +11,14 @@ from helper import Instance
 TOKENIZER = WordPunctTokenizer()
 CandidateTranslations = namedtuple("CandidateTranslations", ["source_sent", "candidates"])
 
-def parallel_corpus_reader(f1, f2, max_sents=100):
+def parallel_corpus_reader(f1, f2, max_sents=-1):
     total_seen = 0
     result = []
     with codecs.open(f1, "r", "utf-8") as ef_in, codecs.open(f2, "r", "utf-8") as ff_in:
         for line in ef_in:
             result.append(map(prepare_sentence, [line, ff_in.readline()]))
             total_seen += 1
-            if total_seen >= max_sents:
+            if max_sents != -1 and total_seen >= max_sents:
                 break
     return result
 
@@ -26,12 +29,12 @@ def eval_data_reader(source, target):
     with codecs.open(source, "r", "utf-8") as f_in:
         for line in f_in:
             id_,sent = line.rstrip().split("\t")
-            source_sentences[id_] = TOKENIZER.tokenize(sent)
+            source_sentences[id_] = (sent, TOKENIZER.tokenize(sent.lower()))
 
     with codecs.open(target, "r", "utf-8") as f_in:
         for line in f_in:
             id_,sent = line.rstrip().split("\t")
-            candidate_translations[id_].append(TOKENIZER.tokenize(sent))
+            candidate_translations[id_].append((sent, TOKENIZER.tokenize(sent.lower())))
 
     for id_,source_sent in source_sentences.iteritems():
         candidates = candidate_translations[id_]
